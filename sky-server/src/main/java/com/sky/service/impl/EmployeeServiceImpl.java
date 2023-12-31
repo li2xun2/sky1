@@ -16,7 +16,6 @@ import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
-import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,14 +82,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
 //        设置创建时间和更新时间
 
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-//ToDo 后期需要更改
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+
         employeeMapper.insert(employee);
 
     }
+
+    /***
+     * 分页查询员工
+     * @param employeePageQueryDTO
+     * @return
+     */
 
     @Override
     public PageResult queryPage(EmployeePageQueryDTO employeePageQueryDTO) {
@@ -102,4 +103,32 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new PageResult(total,result);
     }
 
+    /***
+     * 更改员工状态
+     * @param employee
+     */
+    @Override
+    public void updateStatus(Employee employee) {
+        employeeMapper.updateStatus(employee);
+    }
+
+    /***
+     * 根据id查询员工
+     * @param id
+     * @return
+     */
+
+    @Override
+    public Employee queryById(Long id) {
+       Employee employee = employeeMapper.queryById(id);
+        return employee;
+    }
+
+
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO,employee);
+        employeeMapper.update(employee);
+    }
 }
